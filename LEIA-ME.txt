@@ -1,0 +1,38 @@
+DOCE PEDIDO — ATUALIZAÇÃO VISUAL
+================================
+
+Esta atualização aplica uma identidade visual inspirada em docerias: rosa confeitaria,
+creme baunilha e tons de chocolate, com cards, atalhos e painel inicial reorganizado.
+
+O pacote foi preparado a partir do projeto enviado. Ele NÃO inclui o banco de dados,
+a pasta instance, backups ou o ambiente virtual (venv), para evitar sobrescrever dados
+e arquivos locais sem necessidade.
+
+INSTALAÇÃO SEGURA
+1. Pare o Flask no terminal com Ctrl+C.
+2. Faça uma cópia de segurança de app.py, da pasta templates, da pasta static e,
+   principalmente, de instance\doce_pedido.db.
+3. Extraia este ZIP em uma pasta temporária.
+4. O app.py foi mantido sem alterações funcionais. A opção mais conservadora é não copiá-lo.
+5. Copie a pasta templates do pacote para a pasta do projeto, aceitando substituir
+   os templates correspondentes.
+6. Copie a pasta static do pacote para a pasta do projeto, mantendo arquivos existentes.
+7. NÃO substitua, apague ou mova instance\doce_pedido.db.
+8. Execute novamente: python app.py
+9. Atualize o navegador com Ctrl+F5.
+
+O QUE MUDA
+- Painel inicial com identidade visual de doceria e métricas reais já fornecidas pelo app.
+- Cores consistentes, cartões, botões, campos e tabelas nas telas existentes.
+- Ícones ilustrativos e atalhos para as principais áreas.
+
+O QUE NÃO MUDA
+- app.py e suas rotas/regras de negócio.
+- Banco SQLite e registros.
+- Fluxos de cadastro, edição, exclusão, pagamentos, calendário, produção,
+  relatórios e lembretes.
+
+VALIDAÇÃO
+O pacote foi conferido estruturalmente, mas não foi possível executar o sistema Flask
+neste ambiente. Depois da instalação, teste o painel e abra as telas de clientes,
+encomendas, edição, pagamentos, calendário, produção, relatórios e lembretes.

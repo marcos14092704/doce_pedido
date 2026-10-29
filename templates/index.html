@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doce Pedido | Painel inicial</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}">
+    <style>
+        body { margin: 0; min-height: 100vh; }
+        .dp-header { padding: 24px max(22px, calc((100% - 1180px)/2)); }
+        .dp-header-inner { max-width: 1180px; margin: 0 auto; display:flex; align-items:center; gap:16px; }
+        .dp-logo { display:grid; place-items:center; width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.72); font-size:30px; box-shadow:0 5px 16px #7b405610; }
+        .dp-header h1 { margin:0; font-size:clamp(25px,4vw,34px); }
+        .dp-header p { margin:4px 0 0; }
+        main { padding: 0 20px 35px; }
+        .boas-vindas { margin:28px 0 22px; padding:26px; background:linear-gradient(120deg,#fffdf9,#fff1f5); border:1px solid #f0e0e5; border-radius:20px; }
+        .boas-vindas .eyebrow { color:#bd6f8b; text-transform:uppercase; letter-spacing:1.5px; font-size:11px; font-weight:800; margin:0 0 7px; }
+        .boas-vindas h2 { margin:0; font-size:clamp(22px,3vw,30px); }
+        .boas-vindas p { margin:8px 0 0; }
+        .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(205px,1fr)); gap:16px; }
+        .metric { background:#fffdf9; border:1px solid #f0e3e4; border-radius:17px; padding:21px; box-shadow:0 8px 24px #5c36430a; }
+        .metric-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .metric-icon { display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:#fae8ee; font-size:22px; }
+        .metric h3 { margin:15px 0 2px; font-size:14px; color:#827579; font-weight:650; }
+        .valor { font-size:30px; line-height:1.25; color:#553a3e; font-weight:800; overflow-wrap:anywhere; }
+        .metric p { margin:7px 0 0; font-size:13px; }
+        .section-title { margin:30px 0 13px; font-size:18px; }
+        .acoes { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
+        .atalho { display:flex; align-items:center; gap:13px; padding:16px; border-radius:14px; background:#fffdf9; border:1px solid #f0e3e4; color:#553a3e; text-decoration:none; box-shadow:0 6px 18px #5c364308; font-weight:700; }
+        .atalho:hover { background:#fff0f4; transform:translateY(-2px); }
+        .atalho-icon { width:42px; height:42px; flex:0 0 42px; display:grid; place-items:center; background:#fae8ee; border-radius:12px; font-size:21px; }
+        .atalho small { display:block; font-size:12px; color:#827579; font-weight:400; margin-top:2px; }
+        footer { padding:24px 15px; text-align:center; font-size:12px; }
+        @media(max-width:480px) { .dp-header { padding:18px 16px; } .dp-logo { width:48px;height:48px;font-size:25px; } .boas-vindas { padding:20px; } .valor { font-size:27px; } }
+    </style>
+</head>
+<body>
+    <header class="dp-header">
+        <div class="dp-header-inner">
+            <div class="dp-logo" aria-hidden="true">🍰</div>
+            <div>
+                <h1>Doce Pedido</h1>
+                <p>Um toque de carinho em cada encomenda</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="boas-vindas">
+            <p class="eyebrow">Painel da doceria</p>
+            <h2>Seu dia mais doce começa aqui ✨</h2>
+            <p>Organize clientes, encomendas, pagamentos e produção em um só lugar.</p>
+        </section>
+
+        <section class="cards" aria-label="Resumo do sistema">
+            <article class="metric">
+                <div class="metric-top"><span class="metric-icon">👥</span><span>01</span></div>
+                <h3>Clientes cadastrados</h3>
+                <div class="valor">{{ total_clientes }}</div>
+                <p>Clientes na sua agenda</p>
+            </article>
+            <article class="metric">
+                <div class="metric-top"><span class="metric-icon">🎂</span><span>02</span></div>
+                <h3>Total de encomendas</h3>
+                <div class="valor">{{ total_encomendas }}</div>
+                <p>Pedidos registrados no sistema</p>
+            </article>
+            <article class="metric">
+                <div class="metric-top"><span class="metric-icon">🧁</span><span>03</span></div>
+                <h3>Encomendas pendentes</h3>
+                <div class="valor">{{ pendentes }}</div>
+                <p>Pedidos com status pendente</p>
+            </article>
+        </section>
+
+        <h2 class="section-title">O que você deseja fazer?</h2>
+        <section class="acoes">
+            <a href="{{ url_for('nova_encomenda') }}" class="atalho"><span class="atalho-icon">➕</span><span>Nova encomenda<small>Registre um novo pedido</small></span></a>
+            <a href="{{ url_for('listar_encomendas') }}" class="atalho"><span class="atalho-icon">📋</span><span>Encomendas<small>Consulte e atualize os pedidos</small></span></a>
+            <a href="{{ url_for('listar_clientes') }}" class="atalho"><span class="atalho-icon">💗</span><span>Clientes<small>Cadastre e consulte contatos</small></span></a>
+            <a href="{{ url_for('calendario') }}" class="atalho"><span class="atalho-icon">📅</span><span>Calendário de entregas<small>Planeje os próximos dias</small></span></a>
+            <a href="{{ url_for('lista_producao') }}" class="atalho"><span class="atalho-icon">👩‍🍳</span><span>Lista de produção<small>Organize o preparo dos pedidos</small></span></a>
+            <a href="{{ url_for('relatorios') }}" class="atalho"><span class="atalho-icon">📊</span><span>Relatórios<small>Acompanhe os resultados</small></span></a>
+            <a href="{{ url_for('lembretes_whatsapp') }}" class="atalho"><span class="atalho-icon">💬</span><span>Lembretes WhatsApp<small>Confira encomendas próximas</small></span></a>
+        </section>
+    </main>
+    <footer>Doce Pedido · Feito com carinho para a sua doceria</footer>
+</body>
+</html>

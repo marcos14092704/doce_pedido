@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Clientes | Doce Pedido</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #fcecd4;
+            color: #343434;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 20px auto;
+        }
+
+        .painel {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px #0000000c;
+        }
+
+        h1, h2, p{
+            margin-top: 0;
+            
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            margin: 8px 0 18px;
+            border: 1px solid #ffb87f;
+            border-radius: 7px;
+            font-size: 16px;
+            
+        }
+
+        .opcoes input {
+            accent-color: #bd713d;
+        }
+
+        button, .botao {
+            display: inline-block;
+            border: 0;
+            border-radius: 7px;
+            padding: 13px 18px;
+            background: #f78cb5;
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .secundario {
+            background: #bd713d;
+        }
+
+        .mensagem {
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+            background: #f1f1f1;
+        }
+
+        .sucesso {
+            background: #e2f5e8;
+            color: #176534;
+        }
+
+        .erro {
+            background: #fde8e7;
+            color: #a12222;
+        }
+
+        .cliente {
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+        }
+
+        .cliente:last-child {
+            border-bottom: 0;
+        }
+
+        .vazio {
+            color: #777;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .painel {
+                padding: 18px;
+            }
+
+            .botao, button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}"></head>
+
+<body>
+<main>
+    <div class="painel">
+        <h1>👥 Clientes</h1>
+        <p>Cadastre os clientes da sua confeitaria.</p>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">
+                    {{ mensagem }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <h2>Novo cliente</h2>
+
+        <form action="{{ url_for('novo_cliente') }}" method="POST">
+            <label for="nome">Nome completo</label>
+            <input
+                type="text"
+                id="nome"
+                name="nome"
+                maxlength="150"
+                placeholder="Nome do cliente"
+                required
+            >
+
+            <label for="telefone">WhatsApp / telefone</label>
+            <input
+                type="tel"
+                id="telefone"
+                name="telefone"
+                maxlength="30"
+                placeholder="(99) 99999-9999"
+                required
+            >
+
+            <button type="submit">Salvar cliente</button>
+        </form>
+    </div>
+
+    <div class="painel">
+        <h2>Clientes cadastrados</h2>
+
+        {% if clientes %}
+            {% for cliente in clientes %}
+                <div class="cliente">
+                    <strong>{{ cliente.nome }}</strong><br>
+                    <span>Telefone: {{ cliente.telefone }}</span><br>
+                    <small>Cadastro: {{ cliente.data_cadastro }}</small>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="vazio">
+                Nenhum cliente cadastrado ainda.
+            </p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('inicio') }}" class="botao secundario">
+        Voltar ao painel
+    </a>
+</main>
+</body>
+</html>

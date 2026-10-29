@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar encomenda | Doce Pedido</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            background: #f7f5f2;
+            color: #343434;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+        }
+
+        .painel {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px #0000000c;
+        }
+
+        h1,
+        h2 {
+            margin-top: 0;
+        }
+
+        h2 {
+            margin-top: 28px;
+        }
+
+        .grade {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input:not([type="radio"]),
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font: inherit;
+            min-width: 0;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .opcoes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin: 10px 0 18px;
+        }
+
+        .opcoes label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .opcoes input {
+            accent-color: #bd713d;
+        }
+
+        button,
+        .botao {
+            display: inline-block;
+            padding: 13px 18px;
+            border: 0;
+            border-radius: 7px;
+            background: #f78cb5;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .secundario {
+            background: #bd713d;
+        }
+
+        .adicionar {
+            margin-bottom: 18px;
+        }
+
+        .remover {
+            background: #a63832;
+            padding: 9px 12px;
+        }
+
+        .item {
+            border: 1px solid #eee;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mensagem {
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .erro {
+            background: #fde8e7;
+            color: #a12222;
+        }
+
+        .sucesso {
+            background: #e2f5e8;
+            color: #176534;
+        }
+
+        .nota {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .painel {
+                padding: 16px;
+            }
+
+            .grade {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            button,
+            .botao {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}"></head>
+
+<body>
+    <main>
+        <div class="painel">
+            <h1>✏️ Editar encomenda #{{ encomenda.id }}</h1>
+            <p>Altere os dados da encomenda e salve as mudanças.</p>
+
+            {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+            <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+            {% endwith %}
+
+            {% if not clientes %}
+            <p>Cadastre um cliente antes de criar uma encomenda.</p>
+            <a class="botao" href="{{ url_for('novo_cliente') }}">Cadastrar cliente</a>
+            {% else %}
+            <form method="POST" id="formEncomenda">
+                <h2>1. Cliente e evento</h2>
+                <label for="cliente_id">Cliente *</label>
+                <select id="cliente_id" name="cliente_id" required>
+                    <option value="">Selecione um cliente</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}" {% if cliente.id==encomenda.cliente_id %}selected{% endif %}>{{
+                        cliente.nome }} — {{ cliente.telefone }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="grade">
+                    <div>
+                        <label for="data_evento">Data da entrega *</label>
+                        <input type="date" id="data_evento" name="data_evento" min="{{ hoje }}"
+                            value="{{ encomenda.data_evento }}" required>
+                    </div>
+                    <div>
+                        <label for="hora_evento">Horário para entrega *</label>
+                        <input type="text" id="hora_evento" name="hora_evento"
+                            placeholder="Digite o horário (ex.: 14:30)" inputmode="numeric"
+                            pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" maxlength="5"
+                            value="{{ encomenda.hora_evento or '' }}"
+                            title="Digite o horário no formato HH:MM, por exemplo 14:30" required>
+                    </div>
+                </div>
+
+                <h2>2. Bolo personalizado</h2>
+                <label for="descricao_bolo">Descrição do bolo</label>
+                <input id="descricao_bolo" name="descricao_bolo" maxlength="500"
+                    value="{{ encomenda.descricao_bolo or '' }}" placeholder="Ex.: bolo de aniversário de 3 kg">
+
+                <div class="grade">
+                    <div>
+                        <label for="tema">Tema e decoração</label>
+                        <input id="tema" name="tema" maxlength="200" value="{{ encomenda.tema or '' }}"
+                            placeholder="Ex.: flores, personagem, cores">
+                    </div>
+                    <div>
+                        <label for="recheio">Massa e recheios</label>
+                        <input id="recheio" name="recheio" maxlength="300" value="{{ encomenda.recheio or '' }}"
+                            placeholder="Ex.: chocolate com ninho">
+                    </div>
+                </div>
+
+                <label>Topo do bolo</label>
+                <div class="opcoes">
+                    <label><input type="radio" name="topo" value="Simples" {% if encomenda.topo !='De luxo' %}checked{%
+                            endif %}> Simples</label>
+                    <label><input type="radio" name="topo" value="De luxo" {% if encomenda.topo=='De luxo' %}checked{%
+                            endif %}> De luxo</label>
+                </div>
+
+                <label for="valor_bolo">Valor do bolo (R$)</label>
+                <input type="number" id="valor_bolo" name="valor_bolo" min="0" step="0.01"
+                    value="{{ '%.2f'|format(encomenda.valor_bolo or 0) }}" required>
+
+                <h2>3. Deseja incluir doces?</h2>
+                <div class="opcoes">
+                    <label><input type="radio" name="incluir_doces" value="sim" {% if
+                            itens|selectattr('categoria', 'equalto' , 'DOCE' )|list|length> 0 %}checked{% elif
+                        itens|length == 0 %}checked{% endif %}> Sim</label>
+                    <label><input type="radio" name="incluir_doces" value="nao" {% if
+                            itens|selectattr('categoria', 'equalto' , 'DOCE' )|list|length==0 and itens|length> 0
+                        %}checked{% endif %}> Não</label>
+                </div>
+                <div id="areaDoces">
+                    <div id="listaDoces"></div>
+                    <button type="button" class="adicionar" id="adicionarDoce">+ Adicionar doce</button>
+                </div>
+
+                <h2>4. Deseja incluir salgados?</h2>
+                <div class="opcoes">
+                    <label><input type="radio" name="incluir_salgados" value="sim" {% if
+                            itens|selectattr('categoria', 'equalto' , 'SALGADO' )|list|length> 0 %}checked{% elif
+                        itens|length == 0 %}checked{% endif %}> Sim</label>
+                    <label><input type="radio" name="incluir_salgados" value="nao" {% if
+                            itens|selectattr('categoria', 'equalto' , 'SALGADO' )|list|length==0 and itens|length> 0
+                        %}checked{% endif %}> Não</label>
+                </div>
+                <div id="areaSalgados">
+                    <div id="listaSalgados"></div>
+                    <button type="button" class="adicionar" id="adicionarSalgado">+ Adicionar salgado</button>
+                </div>
+
+                <h2>5. Pagamento</h2>
+                <label for="entrada">Valor da entrada (R$)</label>
+                <input type="number" id="entrada" name="entrada" min="0" step="0.01"
+                    value="{{ '%.2f'|format(encomenda.entrada or 0) }}" required>
+                <p class="nota">O saldo será calculado descontando a entrada do valor total do bolo, doces e salgados.
+                </p>
+
+                <h2>6. Observações</h2>
+                <label for="observacoes">Detalhes adicionais</label>
+                <textarea id="observacoes" name="observacoes" rows="4" maxlength="2000"
+                    placeholder="Entrega, endereço e outras instruções">{{ encomenda.observacoes or '' }}</textarea>
+
+                <button type="submit">Salvar alterações</button>
+                <a class="botao secundario" href="{{ url_for('listar_encomendas') }}">Cancelar</a>
+            </form>
+            {% endif %}
+        </div>
+    </main>
+
+    <script>
+
+        function adicionarItem(listaId, categoria, titulo) {
+            const lista = document.getElementById(listaId);
+            const item = document.createElement("div");
+            item.className = "item";
+
+            const cabecalho = document.createElement("strong");
+            cabecalho.textContent = titulo;
+
+            const categoriaInput = document.createElement("input");
+            categoriaInput.type = "hidden";
+            categoriaInput.name = "categoria_item";
+            categoriaInput.value = categoria;
+
+            const descricaoLabel = document.createElement("label");
+            descricaoLabel.textContent = "Produto";
+            const descricao = document.createElement("input");
+            descricao.name = "descricao_item";
+            descricao.maxLength = 150;
+            descricao.placeholder = categoria === "DOCE" ? "Ex.: brigadeiro" : "Ex.: coxinha";
+
+            const grade = document.createElement("div");
+            grade.className = "grade";
+
+            const divQtd = document.createElement("div");
+            const labelQtd = document.createElement("label");
+            labelQtd.textContent = "Quantidade";
+            const quantidade = document.createElement("input");
+            quantidade.type = "number";
+            quantidade.name = "quantidade_item";
+            quantidade.min = "1";
+            quantidade.step = "1";
+            quantidade.placeholder = "Ex.: 100";
+            divQtd.append(labelQtd, quantidade);
+
+            const divPreco = document.createElement("div");
+            const labelPreco = document.createElement("label");
+            labelPreco.textContent = "Preço unitário (R$)";
+            const preco = document.createElement("input");
+            preco.type = "number";
+            preco.name = "valor_unitario_item";
+            preco.min = "0";
+            preco.step = "0.01";
+            preco.placeholder = "Ex.: 1.50";
+            divPreco.append(labelPreco, preco);
+            grade.append(divQtd, divPreco);
+
+            const remover = document.createElement("button");
+            remover.type = "button";
+            remover.className = "remover";
+            remover.textContent = "Remover item";
+            remover.addEventListener("click", () => item.remove());
+
+            item.append(cabecalho, categoriaInput, descricaoLabel, descricao, grade, remover);
+            lista.appendChild(item);
+        }
+
+        let numeroDoce = 0;
+        let numeroSalgado = 0;
+        document.getElementById("adicionarDoce").addEventListener("click", () => {
+            adicionarItem("listaDoces", "DOCE", "Doce " + (++numeroDoce));
+        });
+        document.getElementById("adicionarSalgado").addEventListener("click", () => {
+            adicionarItem("listaSalgados", "SALGADO", "Salgado " + (++numeroSalgado));
+        });
+
+        function configurarOpcao(nome, areaId, listaId, adicionarId) {
+            document.querySelectorAll(`input[name="${nome}"]`).forEach(radio => {
+                radio.addEventListener("change", () => {
+                    const ativo = document.querySelector(`input[name="${nome}"]:checked`).value === "sim";
+                    document.getElementById(areaId).hidden = !ativo;
+                    document.querySelectorAll(`#${listaId} input, #${listaId} button`).forEach(campo => campo.disabled = !ativo);
+                    if (ativo && document.getElementById(listaId).children.length === 0) {
+                        document.getElementById(adicionarId).click();
+                    }
+                });
+            });
+        }
+
+        configurarOpcao("incluir_doces", "areaDoces", "listaDoces", "adicionarDoce");
+        configurarOpcao("incluir_salgados", "areaSalgados", "listaSalgados", "adicionarSalgado");
+        const itensIniciais = {{ itens| map(attribute = 'categoria') | list | tojson }};
+        const dadosItens = [{% for item in itens %}{ categoria: { { item.categoria | tojson } }, descricao: { { item.descricao | tojson } }, quantidade: { { item.quantidade | tojson } }, valor: { { item.valor_unitario | tojson } } } {% if not loop.last %}, {% endif %} {% endfor %}];
+        dadosItens.forEach(dado => {
+            const listaId = dado.categoria === "DOCE" ? "listaDoces" : "listaSalgados";
+            const titulo = dado.categoria === "DOCE" ? "Doce " + (++numeroDoce) : "Salgado " + (++numeroSalgado);
+            adicionarItem(listaId, dado.categoria, titulo);
+            const item = document.getElementById(listaId).lastElementChild;
+            item.querySelector('[name="descricao_item"]').value = dado.descricao;
+            item.querySelector('[name="quantidade_item"]').value = dado.quantidade;
+            item.querySelector('[name="valor_unitario_item"]').value = Number(dado.valor).toFixed(2);
+        });
+        if (!dadosItens.some(i => i.categoria === "DOCE")) document.querySelector('input[name="incluir_doces"][value="nao"]').checked = true;
+        if (!dadosItens.some(i => i.categoria === "SALGADO")) document.querySelector('input[name="incluir_salgados"][value="nao"]').checked = true;
+        document.querySelectorAll('input[name="incluir_doces"]:checked, input[name="incluir_salgados"]:checked').forEach(r => r.dispatchEvent(new Event("change")));
+
+        document.getElementById("formEncomenda").addEventListener("submit", event => {
+            for (const listaId of ["listaDoces", "listaSalgados"]) {
+                const lista = document.getElementById(listaId);
+                if (lista.closest("[hidden]")) continue;
+
+                for (const item of lista.children) {
+                    const descricao = item.querySelector('[name="descricao_item"]');
+                    const quantidade = item.querySelector('[name="quantidade_item"]');
+                    const preco = item.querySelector('[name="valor_unitario_item"]');
+                    const preenchidos = [descricao.value.trim(), quantidade.value.trim(), preco.value.trim()].filter(Boolean).length;
+                    if (preenchidos > 0 && preenchidos < 3) {
+                        event.preventDefault();
+                        alert("Complete produto, quantidade e preço de cada item.");
+                        return;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

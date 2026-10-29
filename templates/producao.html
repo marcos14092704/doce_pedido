@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lista de produção | Doce Pedido</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            background: #f7f5f2;
+            color: #343434;
+            font-family: Arial, sans-serif
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 18px auto
+        }
+
+        .painel {
+            background: #fff;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 3px 14px #0000000c
+        }
+
+        .topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        h1 {
+            margin: 0 0 8px
+        }
+
+        .muted {
+            color: #777
+        }
+
+        .botao,
+        button {
+            display: inline-block;
+            padding: 10px 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #bd713d;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .secundario {
+            background: #5b514c
+        }
+
+        .filtros {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px 0
+        }
+
+        .filtros input {
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font: inherit
+        }
+
+        .resumo {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin: 18px 0
+        }
+
+        .resumo div {
+            background: #fff7f1;
+            border: 1px solid #f1dfd2;
+            padding: 12px;
+            border-radius: 9px
+        }
+
+        .resumo strong {
+            display: block;
+            font-size: 20px;
+            margin-top: 5px
+        }
+
+        .secao {
+            margin-top: 24px
+        }
+
+        .secao h2 {
+            font-size: 19px;
+            border-bottom: 2px solid #f0dfd4;
+            padding-bottom: 9px
+        }
+
+        .tabela {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .tabela th,
+        .tabela td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top
+        }
+
+        .tabela th {
+            background: #faf7f4
+        }
+
+        .tag {
+            display: inline-block;
+            background: #f8e8dc;
+            color: #75452d;
+            padding: 4px 7px;
+            border-radius: 6px;
+            font-size: 12px
+        }
+
+        .vazio {
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 8px;
+            color: #777
+        }
+
+        .pedido {
+            border: 1px solid #eee0d7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 12px 0;
+            break-inside: avoid
+        }
+
+        .pedido h3 {
+            margin: 0 0 8px
+        }
+
+        .pedido p {
+            margin: 6px 0
+        }
+
+        .itens {
+            padding-left: 20px;
+            margin: 8px 0
+        }
+
+        .mensagem {
+            padding: 12px;
+            border-radius: 7px;
+            margin: 12px 0
+        }
+
+        .erro {
+            background: #fde8e7;
+            color: #a12222
+        }
+
+        .acoes-topo {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        @media(max-width:650px) {
+            body {
+                padding: 10px
+            }
+
+            .painel {
+                padding: 15px
+            }
+
+            .resumo {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+
+            .tabela {
+                font-size: 13px
+            }
+
+            .tabela th,
+            .tabela td {
+                padding: 7px
+            }
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                padding: 0
+            }
+
+            .painel {
+                box-shadow: none;
+                padding: 0
+            }
+
+            .nao-imprimir {
+                display: none !important
+            }
+
+            main {
+                max-width: none;
+                margin: 0
+            }
+
+            .pedido {
+                border-color: #bbb
+            }
+
+            .secao h2 {
+                border-color: #999
+            }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}"></head>
+
+<body>
+    <main>
+        <section class="painel">
+            <div class="topo">
+                <div>
+                    <h1>🍰 Lista de produção</h1>
+                    <div class="muted">Planejamento diário de bolos, doces e salgados.</div>
+                    <div style="margin-top:8px"><strong>Data: {{ data_selecionada.strftime('%d/%m/%Y') }}</strong></div>
+                </div>
+                <div class="acoes-topo nao-imprimir"><a class="botao secundario"
+                        href="{{ url_for('calendario', visao='dia', data=data_selecionada.isoformat()) }}">📅
+                        Calendário</a><a class="botao secundario" href="{{ url_for('listar_encomendas') }}">←
+                        Encomendas</a><a class="botao" href="{{ url_for('lembretes_whatsapp') }}">💬 Lembretes
+                        WhatsApp</a><button onclick="window.print()">🖨️ Imprimir</button></div>
+            </div>
+            {% with mensagens=get_flashed_messages(with_categories=true) %}{% for categoria,mensagem in mensagens %}<div
+                class="mensagem {{ categoria }}">{{ mensagem }}</div>{% endfor %}{% endwith %}
+            <form class="filtros nao-imprimir" method="get" action="{{ url_for('lista_producao') }}"><label
+                    for="data">Escolha o dia:</label><input id="data" type="date" name="data"
+                    value="{{ data_selecionada.isoformat() }}" required><button type="submit">Consultar</button></form>
+            <div class="resumo">
+                <div>Encomendas<strong>{{ total_encomendas }}</strong></div>
+                <div>Bolos<strong>{{ total_bolos }}</strong></div>
+                <div>Doces (unidades)<strong>{{ total_doces }}</strong></div>
+                <div>Salgados (unidades)<strong>{{ total_salgados }}</strong></div>
+            </div>
+            <div class="secao">
+                <h2>🎂 Bolos e encomendas do dia</h2>
+                {% if encomendas %}{% for e in encomendas %}<article class="pedido">
+                    <h3>{{ e.hora_evento or 'Horário não informado' }} — {{ e.cliente_nome }} <span class="tag">{{
+                            e.status }}</span></h3>{% if e.cliente_telefone %}<p><strong>Telefone:</strong> {{
+                        e.cliente_telefone }}</p>{% endif %}
+                    {% if e.descricao_bolo %}<p><strong>Bolo:</strong> {{ e.descricao_bolo }}</p>{% endif %}{% if e.tema
+                    %}<p><strong>Tema:</strong> {{ e.tema }}</p>{% endif %}{% if e.recheio %}<p>
+                        <strong>Recheio:</strong> {{ e.recheio }}</p>{% endif %}{% if e.topo %}<p><strong>Topo:</strong>
+                        {{ e.topo }}</p>{% endif %}
+                    {% set itens = itens_por_encomenda.get(e.id, []) %}{% if itens %}<p><strong>Doces e salgados desta
+                            encomenda:</strong></p>
+                    <ul class="itens">{% for item in itens %}<li>{{ item.quantidade }} × {{ item.descricao }} ({{ 'Doce'
+                            if item.categoria == 'DOCE' else 'Salgado' }})</li>{% endfor %}</ul>{% endif %}{% if
+                    e.observacoes %}<p><strong>Observações:</strong> {{ e.observacoes }}</p>{% endif %}<p
+                        class="nao-imprimir"><a href="{{ url_for('editar_encomenda', encomenda_id=e.id) }}"
+                            style="color:#8b512d">Ver / editar encomenda →</a></p>
+                </article>{% endfor %}{% else %}<div class="vazio">Não há encomendas ativas cadastradas para esta data.
+                </div>{% endif %}
+            </div>
+            <div class="secao">
+                <h2>🍬 Total de doces para preparar</h2>{% if totais_doces %}<table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade total</th>
+                        </tr>
+                    </thead>
+                    <tbody>{% for nome,quantidade in totais_doces|dictsort %}<tr>
+                            <td>{{ nome }}</td>
+                            <td><strong>{{ quantidade }}</strong></td>
+                        </tr>{% endfor %}</tbody>
+                </table>{% else %}<div class="vazio">Nenhum doce registrado para esta data.</div>{% endif %}
+            </div>
+            <div class="secao">
+                <h2>🥟 Total de salgados para preparar</h2>{% if totais_salgados %}<table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade total</th>
+                        </tr>
+                    </thead>
+                    <tbody>{% for nome,quantidade in totais_salgados|dictsort %}<tr>
+                            <td>{{ nome }}</td>
+                            <td><strong>{{ quantidade }}</strong></td>
+                        </tr>{% endfor %}</tbody>
+                </table>{% else %}<div class="vazio">Nenhum salgado registrado para esta data.</div>{% endif %}
+            </div>
+            <p class="nao-imprimir" style="margin-top:22px"><a href="{{ url_for('inicio') }}" style="color:#8b512d">←
+                    Voltar ao início</a></p>
+        </section>
+    </main>
+</body>
+
+</html>

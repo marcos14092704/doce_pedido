@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calendário de entregas | Doce Pedido</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            background: #f7f5f2;
+            color: #343434;
+            font-family: Arial, sans-serif
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 18px auto
+        }
+
+        .painel {
+            background: #fff;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 3px 14px #0000000c
+        }
+
+        .topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        h1 {
+            margin: 0 0 8px
+        }
+
+        .muted {
+            color: #777
+        }
+
+        .botao,
+        button {
+            display: inline-block;
+            padding: 10px 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #bd713d;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .secundario {
+            background: #5b514c
+        }
+
+        .filtros {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px 0
+        }
+
+        .filtros a.ativo {
+            background: #733f2b
+        }
+
+        .filtros form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .filtros input {
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font: inherit
+        }
+
+        .navegacao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 20px
+        }
+
+        .resumo {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px
+        }
+
+        .resumo div {
+            background: #fff7f1;
+            border: 1px solid #f1dfd2;
+            padding: 12px 16px;
+            border-radius: 9px
+        }
+
+        .resumo strong {
+            display: block;
+            font-size: 19px;
+            margin-top: 4px
+        }
+
+        .dias {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px
+        }
+
+        .dia {
+            border: 1px solid #eee0d7;
+            border-radius: 11px;
+            overflow: hidden;
+            min-width: 0
+        }
+
+        .dia-cabecalho {
+            background: #fff6ef;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: center
+        }
+
+        .dia-cabecalho h2 {
+            font-size: 16px;
+            margin: 0
+        }
+
+        .sem-encomendas {
+            padding: 14px;
+            color: #999;
+            font-size: 13px
+        }
+
+        .pedido {
+            padding: 13px 14px;
+            border-top: 1px solid #f0e9e4
+        }
+
+        .pedido-topo {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: start
+        }
+
+        .cliente {
+            font-weight: bold
+        }
+
+        .hora {
+            white-space: nowrap;
+            color: #7b4a32;
+            font-weight: bold
+        }
+
+        .detalhes {
+            font-size: 13px;
+            color: #666;
+            margin-top: 7px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: bold;
+            background: #fff0d8;
+            color: #8a5700
+        }
+
+        .status.confirmada,
+        .status.paga {
+            background: #e2f5e8;
+            color: #176534
+        }
+
+        .status.cancelada,
+        .status.cancelado {
+            background: #fde8e7;
+            color: #a12222
+        }
+
+        .acoes {
+            margin-top: 9px
+        }
+
+        .acoes a {
+            font-size: 12px;
+            color: #8b512d;
+            text-decoration: none;
+            font-weight: bold
+        }
+
+        .sem-resultados {
+            padding: 22px;
+            text-align: center;
+            color: #777;
+            background: #fafafa;
+            border-radius: 10px
+        }
+
+        @media(max-width:650px) {
+            body {
+                padding: 10px
+            }
+
+            .painel {
+                padding: 15px
+            }
+
+            .dias {
+                grid-template-columns: 1fr
+            }
+
+            .navegacao {
+                align-items: stretch
+            }
+
+            .navegacao .botao {
+                padding: 9px 10px
+            }
+
+            .resumo div {
+                flex: 1
+            }
+
+            .filtros form {
+                width: 100%
+            }
+
+            .filtros input {
+                flex: 1;
+                min-width: 130px
+            }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}"></head>
+
+<body>
+    <main>
+        <section class="painel">
+            <div class="topo">
+                <div>
+                    <h1>📅 Calendário de entregas</h1>
+                    <div class="muted">Consulte as encomendas por dia, semana ou mês.</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="botao"
+                        href="{{ url_for('lista_producao', data=selecionada.isoformat()) }}">🍰 Lista de produção</a><a
+                        class="botao" href="{{ url_for('lembretes_whatsapp') }}">💬 Lembretes WhatsApp</a><a
+                        class="botao secundario" href="{{ url_for('listar_encomendas') }}">← Encomendas</a></div>
+            </div>
+            <div class="filtros">
+                <a class="botao {% if visao == 'dia' %}ativo{% endif %}"
+                    href="{{ url_for('calendario', visao='dia', data=selecionada.isoformat()) }}">Dia</a>
+                <a class="botao {% if visao == 'semana' %}ativo{% endif %}"
+                    href="{{ url_for('calendario', visao='semana', data=selecionada.isoformat()) }}">Semana</a>
+                <a class="botao {% if visao == 'mes' %}ativo{% endif %}"
+                    href="{{ url_for('calendario', visao='mes', data=selecionada.isoformat()) }}">Mês</a>
+                <form method="get" action="{{ url_for('calendario') }}"><input type="hidden" name="visao"
+                        value="{{ visao }}"><label for="data">Ir para:</label><input id="data" type="date" name="data"
+                        value="{{ selecionada.isoformat() }}" required><button type="submit">Consultar</button></form>
+            </div>
+            <div class="navegacao"><a class="botao secundario"
+                    href="{{ url_for('calendario', visao=visao, data=anterior.isoformat()) }}">← Anterior</a><strong>{{
+                    titulo_periodo }}</strong><a class="botao secundario"
+                    href="{{ url_for('calendario', visao=visao, data=proximo.isoformat()) }}">Próximo →</a></div>
+            <div class="resumo">
+                <div>Encomendas<strong>{{ total_encomendas }}</strong></div>
+                <div>Valor total<strong>{{ total_valor|moeda }}</strong></div>
+            </div>
+            <div class="dias">
+                {% for dia in dias %}<article class="dia">
+                    <div class="dia-cabecalho">
+                        <h2>{{ dia.data.strftime('%d/%m/%Y') }}{% if dia.data == selecionada %} · selecionado{% endif %}
+                        </h2><span>{{ dia.encomendas|length }} encomenda(s)</span>
+                    </div>
+                    {% if dia.encomendas %}{% for e in dia.encomendas %}<div class="pedido">
+                        <div class="pedido-topo"><span class="cliente">{{ e.cliente_nome }}</span><span class="hora">{{
+                                e.hora_evento or 'Horário não informado' }}</span></div>
+                        <div class="detalhes"><span>Valor: {{ e.total|moeda }}</span><span
+                                class="status {{ e.status|lower|replace(' ', '-') }}">{{ e.status }}</span></div>
+                        <div class="acoes"><a href="{{ url_for('editar_encomenda', encomenda_id=e.id) }}">Ver / editar
+                                encomenda →</a></div>
+                    </div>{% endfor %}{% else %}<div class="sem-encomendas">Nenhuma entrega prevista neste dia.</div>{%
+                    endif %}
+                </article>{% endfor %}
+            </div>
+            <p style="margin-top:22px"><a href="{{ url_for('inicio') }}" style="color:#8b512d">← Voltar ao início</a>
+            </p>
+        </section>
+    </main>
+</body>
+
+</html>

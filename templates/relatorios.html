@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios | Doce Pedido</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 18px; background: #f7f5f2; color: #343434; font-family: Arial, sans-serif; }
+        main { max-width: 1200px; margin: 20px auto; }
+        .painel { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 3px 12px #0000000c; }
+        .topo { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+        h1 { margin: 0 0 8px; } p { line-height: 1.45; }
+        .botao { display:inline-block; padding:10px 14px; border:0; border-radius:7px; background:#bd713d; color:#fff; text-decoration:none; font-weight:bold; cursor:pointer; font-size:14px; }
+        .filtros { display:flex; gap:12px; align-items:end; flex-wrap:wrap; margin:20px 0; padding:16px; background:#faf7f4; border-radius:10px; }
+        .filtros label { display:block; font-weight:bold; margin-bottom:6px; }
+        .filtros input { padding:10px; border:1px solid #d7d0ca; border-radius:7px; font:inherit; }
+        .cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:18px 0 24px; }
+        .card { padding:18px; border:1px solid #eee5df; border-radius:10px; background:#fffdfa; }
+        .card .rotulo { color:#6d625c; font-size:13px; margin-bottom:10px; }
+        .card .valor { font-size:clamp(18px,2.3vw,26px); font-weight:bold; color:#59382b; overflow-wrap:anywhere; }
+        .card .nota { font-size:12px; color:#766a63; margin-top:7px; }
+        .tabela-wrap { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; min-width:760px; }
+        th,td { text-align:left; padding:12px; border-bottom:1px solid #eee; vertical-align:middle; }
+        th { background:#faf7f4; }
+        .status { display:inline-block; font-size:12px; font-weight:bold; border-radius:20px; padding:5px 9px; background:#fff0d8; color:#8a5700; }
+        .status.confirmada { background:#e2f5e8; color:#176534; }
+        .mensagem { padding:12px; border-radius:7px; margin:12px 0; background:#fde8e7; color:#a12222; }
+        .vazio { padding:18px 0; color:#666; }
+        .rodape { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:20px; }
+        @media(max-width:850px) { .cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media(max-width:520px) { body { padding:10px; } .painel { padding:15px; } .cards { grid-template-columns:1fr; } .filtros input,.filtros .botao { width:100%; } }
+        @media print { body { background:#fff; padding:0; } .painel { box-shadow:none; } .filtros,.rodape .botao { display:none; } }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}"></head>
+<body>
+<main>
+    <section class="painel">
+        <div class="topo">
+            <div>
+                <h1>📊 Relatórios</h1>
+                <p>Acompanhe faturamento, pagamentos recebidos e saldo a receber por período.</p>
+            </div>
+            <button class="botao" type="button" onclick="window.print()">Imprimir relatório</button>
+        </div>
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}<div class="mensagem">{{ mensagem }}</div>{% endfor %}
+        {% endwith %}
+
+        <form class="filtros" method="GET" action="{{ url_for('relatorios') }}">
+            <div><label for="inicio">Data inicial</label><input type="date" id="inicio" name="inicio" value="{{ inicio }}" required></div>
+            <div><label for="fim">Data final</label><input type="date" id="fim" name="fim" value="{{ fim }}" required></div>
+            <button class="botao" type="submit">Filtrar período</button>
+        </form>
+
+        <div class="cards">
+            <div class="card"><div class="rotulo">📦 Encomendas no período</div><div class="valor">{{ total_encomendas }}</div><div class="nota">Por data do evento/entrega</div></div>
+            <div class="card"><div class="rotulo">🧁 Valor total das encomendas</div><div class="valor">{{ valor_total|moeda }}</div><div class="nota">Bolos, doces e salgados</div></div>
+            <div class="card"><div class="rotulo">💰 Entradas registradas</div><div class="valor">{{ recebido|moeda }}</div><div class="nota">Entrada inicial + pagamentos adicionais</div></div>
+            <div class="card"><div class="rotulo">⏳ Saldo pendente</div><div class="valor">{{ saldo_pendente|moeda }}</div><div class="nota">{{ quantidade_pendentes }} encomenda(s) com saldo a receber</div></div>
+        </div>
+
+        <h2>Detalhamento das encomendas</h2>
+        {% if encomendas %}
+        <div class="tabela-wrap"><table>
+            <thead><tr><th>Data</th><th>Horário</th><th>Cliente</th><th>Total</th><th>Total recebido</th><th>Saldo</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for e in encomendas %}
+                {% set saldo = (e.total or 0) - (e.total_pago or 0) %}
+                <tr>
+                    <td>{{ e.data_evento[8:10] }}/{{ e.data_evento[5:7] }}/{{ e.data_evento[0:4] }}</td>
+                    <td>{{ e.hora_evento or '—' }}</td>
+                    <td>{{ e.cliente_nome }}</td>
+                    <td>{{ e.total|moeda }}</td>
+                    <td>{{ e.total_pago|moeda }}</td>
+                    <td>{{ saldo|moeda }}</td>
+                    <td><span class="status {% if saldo <= 0 %}confirmada{% endif %}">{% if saldo <= 0 %}QUITADA{% else %}PENDENTE{% endif %}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+        {% else %}<p class="vazio">Nenhuma encomenda encontrada nesse período.</p>{% endif %}
+
+        <div class="rodape">
+            <a class="botao" href="{{ url_for('inicio') }}">← Voltar ao início</a>
+            <a class="botao" href="{{ url_for('listar_encomendas') }}">Ver encomendas</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,166 @@
+/* Doce Pedido — identidade visual confeitaria */
+:root {
+  --dp-rosa: #f4d7e2;
+  --dp-rosa-forte: #bd6f8b;
+  --dp-rosa-escuro: #7b4056;
+  --dp-creme: #fff8ef;
+  --dp-baunilha: #fffdf9;
+  --dp-caramelo: #b87955;
+  --dp-chocolate: #553a3e;
+  --dp-texto: #493b3e;
+  --dp-muted: #827579;
+  --dp-borda: #f0e3e4;
+  --dp-sombra: 0 12px 32px rgba(92, 54, 67, .08);
+}
+* { box-sizing: border-box; }
+body {
+  background: radial-gradient(circle at top left, #fff0f4 0, transparent 32rem), var(--dp-creme) !important;
+  color: var(--dp-texto) !important;
+  font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+  line-height: 1.55;
+}
+header {
+  background: linear-gradient(120deg, #f4d7e2, #fff0e1) !important;
+  color: var(--dp-rosa-escuro) !important;
+  border-bottom: 1px solid #efd6df;
+}
+header h1 { color: var(--dp-rosa-escuro) !important; letter-spacing: -.5px; }
+header p { color: #8d6471 !important; }
+main { max-width: 1240px !important; }
+.painel, .card, .caixa, .bloco, .formulario, .conteudo, .container-painel {
+  background: rgba(255,253,249,.96) !important;
+  border: 1px solid var(--dp-borda) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--dp-sombra) !important;
+}
+h1, h2, h3, h4 { color: var(--dp-chocolate); letter-spacing: -.25px; }
+p { color: #75666a; }
+a { transition: color .18s ease, background .18s ease, transform .18s ease; }
+.botao, button, input[type="submit"], .btn {
+  background: var(--dp-rosa-forte) !important;
+  color: #fff !important;
+  border: 1px solid var(--dp-rosa-forte) !important;
+  border-radius: 10px !important;
+  padding: 10px 15px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(189,111,139,.12);
+}
+.botao:hover, button:hover, input[type="submit"]:hover, .btn:hover {
+  background: var(--dp-rosa-escuro) !important;
+  border-color: var(--dp-rosa-escuro) !important;
+  transform: translateY(-1px);
+}
+.botao-secundario, .editar { background: #88636d !important; border-color: #88636d !important; }
+.excluir { background: #a94e58 !important; border-color: #a94e58 !important; }
+.pagamentos { background: #66856d !important; border-color: #66856d !important; }
+input:not([type=checkbox]):not([type=radio]):not([type=submit]),
+select, textarea {
+  border: 1px solid #e7d7dc !important;
+  border-radius: 9px !important;
+  padding: 10px 12px !important;
+  background: #fffefd !important;
+  color: var(--dp-texto) !important;
+  max-width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 3px solid rgba(189,111,139,.16) !important;
+  border-color: var(--dp-rosa-forte) !important;
+}
+table { border-collapse: separate !important; border-spacing: 0; }
+th { background: #fbecf1 !important; color: var(--dp-rosa-escuro) !important; }
+th, td { border-bottom: 1px solid #f1e6e8 !important; }
+tbody tr:hover { background: #fff8fa; }
+.status { border-radius: 999px !important; }
+.mensagem { border-radius: 10px !important; }
+footer { color: var(--dp-muted) !important; }
+hr { border-color: var(--dp-borda) !important; }
+.topo { gap: 14px; }
+.tabela-wrap { border-radius: 12px; }
+@media (max-width: 700px) {
+  main { margin-top: 14px !important; padding-left: 12px !important; padding-right: 12px !important; }
+  .painel { padding: 16px !important; }
+  .acoes { gap: 8px !important; }
+}
+
+/* Responsividade complementar — Doce Pedido */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, svg, video, canvas { max-width: 100%; height: auto; }
+body { overflow-wrap: break-word; }
+main { width: 100%; min-width: 0; }
+.painel, .card, .caixa, .bloco, .formulario, .conteudo, .container-painel,
+.boas-vindas, .metric, .atalho { min-width: 0; }
+.topo, .acoes, .acoes-topo, .filtros, .navegacao, .pedido-topo {
+  min-width: 0; flex-wrap: wrap;
+}
+input, select, textarea, button { font: inherit; }
+input, select, textarea { min-width: 0; }
+select, textarea { width: 100%; }
+form { min-width: 0; }
+.tabela-wrap, .tabela, .table-responsive { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tabela-wrap table, .tabela table, .table-responsive table { min-width: 680px; }
+button, .botao, .btn, input[type="submit"] { min-height: 42px; touch-action: manipulation; }
+a { overflow-wrap: anywhere; }
+
+@media (max-width: 768px) {
+  body { padding: 12px !important; }
+  main { margin: 12px auto !important; padding-left: 0 !important; padding-right: 0 !important; }
+  .painel, .card, .caixa, .bloco, .formulario, .conteudo, .container-painel {
+    padding: 16px !important; border-radius: 15px !important;
+  }
+  h1 { font-size: clamp(1.45rem, 5vw, 2rem); }
+  h2 { font-size: clamp(1.2rem, 4vw, 1.55rem); }
+  .topo { align-items: stretch !important; }
+  .topo > div { min-width: 0; }
+  .topo > div:last-child { display: flex; flex-wrap: wrap; gap: 8px; }
+  .topo > div:last-child .botao,
+  .acoes-topo .botao { flex: 1 1 150px; text-align: center; }
+  .grade, .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .filtros { align-items: stretch; }
+  .filtros input, .filtros select, .filtros button, .filtros .botao { max-width: 100%; }
+  .filtros input[type="date"], .filtros input[type="month"], .filtros select { flex: 1 1 160px; }
+  .acoes { gap: 8px !important; }
+  .acoes form { max-width: 100%; }
+  .resumo { flex-wrap: wrap; }
+  .resumo > * { min-width: 0; }
+  .dias { min-width: 0; }
+}
+
+@media (max-width: 520px) {
+  body { padding: 8px !important; }
+  main { margin-top: 8px !important; }
+  .painel, .card, .caixa, .bloco, .formulario, .conteudo, .container-painel {
+    padding: 13px !important; border-radius: 12px !important;
+  }
+  .dp-header { padding: 16px 12px !important; }
+  .dp-header-inner { align-items: center; gap: 10px; }
+  .dp-header h1 { font-size: 25px; }
+  .dp-header p { font-size: 13px; }
+  .dp-logo { flex: 0 0 44px; width: 44px !important; height: 44px !important; }
+  .boas-vindas { margin-top: 16px !important; padding: 17px !important; }
+  .cards, .grade, .form-grid, .grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .metric { padding: 16px !important; }
+  .valor { font-size: 26px !important; }
+  .atalho { padding: 13px !important; }
+  .topo > div:last-child { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }
+  .topo > div:last-child .botao,
+  .acoes-topo .botao { width: 100%; }
+  .botao, button, .btn, input[type="submit"] { min-height: 44px; padding: 10px 12px !important; }
+  .filtros { display: flex; flex-direction: column; align-items: stretch; }
+  .filtros input, .filtros select, .filtros button, .filtros .botao,
+  .filtros form, .filtros form input, .filtros form button { width: 100%; max-width: 100%; }
+  .opcoes { gap: 8px; flex-wrap: wrap; }
+  .opcoes label { max-width: 100%; }
+  .acoes { grid-template-columns: minmax(0, 1fr) !important; }
+  .cartao { align-items: stretch !important; }
+  .cartao .botao { width: 100%; text-align: center; }
+  table { font-size: 13px; }
+  th, td { padding: 9px 10px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

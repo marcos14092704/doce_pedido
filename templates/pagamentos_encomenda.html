@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamentos | Doce Pedido</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            background: #f7f5f2;
+            color: #343434;
+            font-family: Arial, sans-serif
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 20px auto
+        }
+
+        .painel {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000c;
+            margin-bottom: 18px
+        }
+
+        h1 {
+            margin-top: 0
+        }
+
+        .botao,
+        button {
+            display: inline-block;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 7px;
+            background: #bd713d;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .voltar {
+            background: #51443d
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px
+        }
+
+        .card {
+            padding: 16px;
+            border-radius: 10px;
+            background: #fff8f1;
+            border: 1px solid #eee5df
+        }
+
+        .rotulo {
+            font-size: 13px;
+            color: #766a63;
+            margin-bottom: 8px
+        }
+
+        .valor {
+            font-size: clamp(18px, 3vw, 25px);
+            font-weight: bold;
+            color: #59382b;
+            overflow-wrap: anywhere
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
+
+        .campo label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px
+        }
+
+        .campo input,
+        .campo select,
+        .campo textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d7d0ca;
+            border-radius: 7px;
+            font: inherit
+        }
+
+        .campo textarea {
+            min-height: 75px;
+            resize: vertical
+        }
+
+        .largura-total {
+            grid-column: 1/-1
+        }
+
+        .mensagem {
+            padding: 12px;
+            border-radius: 7px;
+            margin: 12px 0
+        }
+
+        .erro {
+            background: #fde8e7;
+            color: #a12222
+        }
+
+        .sucesso {
+            background: #e2f5e8;
+            color: #176534
+        }
+
+        .tabela-wrap {
+            overflow-x: auto
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 600px
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 11px;
+            border-bottom: 1px solid #eee
+        }
+
+        th {
+            background: #faf7f4
+        }
+
+        .nota {
+            font-size: 13px;
+            color: #71665f
+        }
+
+        @media(max-width:650px) {
+            body {
+                padding: 10px
+            }
+
+            .painel {
+                padding: 16px
+            }
+
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .largura-total {
+                grid-column: auto
+            }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doce-pedido.css') }}"></head>
+
+<body>
+    <main>
+        <section class="painel">
+            <h1>💳 Pagamentos da encomenda</h1>
+            <p><strong>Cliente:</strong> {{ encomenda.cliente_nome }} &nbsp; | &nbsp; <strong>Entrega:</strong> {{
+                encomenda.data_evento[8:10] }}/{{ encomenda.data_evento[5:7] }}/{{ encomenda.data_evento[0:4] }} às {{
+                encomenda.hora_evento or '—' }}</p>
+            {% with mensagens=get_flashed_messages(with_categories=true) %}{% for categoria,mensagem in mensagens %}<div
+                class="mensagem {{ categoria }}">{{ mensagem }}</div>{% endfor %}{% endwith %}
+            <div class="grid">
+                <div class="card">
+                    <div class="rotulo">Total da encomenda</div>
+                    <div class="valor">{{ total|moeda }}</div>
+                </div>
+                <div class="card">
+                    <div class="rotulo">Total já pago (inclui entrada)</div>
+                    <div class="valor">{{ total_pago|moeda }}</div>
+                </div>
+                <div class="card">
+                    <div class="rotulo">Saldo a receber</div>
+                    <div class="valor">{{ saldo|moeda }}</div>
+                </div>
+            </div>
+        </section>
+        <section class="painel">
+            <h2>Registrar novo pagamento</h2>
+            {% if saldo > 0 %}<form method="POST">
+                <div class="form-grid">
+                    <div class="campo"><label for="valor">Valor recebido (R$) *</label><input id="valor" name="valor"
+                            type="text" inputmode="decimal" placeholder="Ex.: 50,00" required></div>
+                    <div class="campo"><label for="forma_pagamento">Forma de pagamento *</label><select
+                            id="forma_pagamento" name="forma_pagamento" required>
+                            <option value="">Selecione</option>{% for forma in formas %}<option value="{{ forma }}">{{
+                                forma }}</option>{% endfor %}
+                        </select></div>
+                    <div class="campo"><label for="data_pagamento">Data do pagamento *</label><input id="data_pagamento"
+                            name="data_pagamento" type="text" value="{{ hoje }}" placeholder="DD/MM/AAAA"
+                            pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" maxlength="10" required></div>
+                    <div class="campo"><label for="observacoes">Observações</label><input id="observacoes"
+                            name="observacoes" type="text" placeholder="Opcional"></div>
+                    <div class="largura-total"><button type="submit">+ Registrar pagamento</button></div>
+                </div>
+            </form>{% else %}<p><strong>Esta encomenda está quitada.</strong> Não há saldo a receber.</p>{% endif %}
+            <p class="nota">A entrada original é mantida como pagamento inicial. Registre aqui os pagamentos adicionais.
+                O valor informado não pode ultrapassar o saldo restante.</p>
+        </section>
+        <section class="painel">
+            <h2>Histórico de pagamentos</h2>
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Forma</th>
+                            <th>Valor</th>
+                            <th>Observações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if entrada > 0 %}<tr>
+                            <td>—</td>
+                            <td>Entrada inicial (data não registrada)</td>
+                            <td>Não informada</td>
+                            <td>{{ entrada|moeda }}</td>
+                            <td>Valor de entrada registrado na encomenda</td>
+                        </tr>{% endif %}
+                        {% for p in historico %}<tr>
+                            <td>{{ p.data_pagamento[8:10] }}/{{ p.data_pagamento[5:7] }}/{{ p.data_pagamento[0:4] }}
+                            </td>
+                            <td>Pagamento adicional</td>
+                            <td>{{ p.forma_pagamento }}</td>
+                            <td>{{ p.valor|moeda }}</td>
+                            <td>{{ p.observacoes or '—' }}</td>
+                        </tr>{% endfor %}
+                        {% if entrada <= 0 and not historico %}<tr>
+                            <td colspan="5">Nenhum pagamento registrado até o momento.</td>
+                            </tr>{% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top:20px"><a class="botao voltar" href="{{ url_for('listar_encomendas') }}">← Voltar às
+                    encomendas</a> <a class="botao" href="{{ url_for('relatorios') }}">Ver relatórios</a></p>
+        </section>
+    </main>
+</body>
+
+</html>

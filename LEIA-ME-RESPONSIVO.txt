@@ -1,0 +1,27 @@
+DOCE PEDIDO — ATUALIZAÇÃO RESPONSIVA
+
+Objetivo
+Adaptar as telas do Doce Pedido para celular, tablet e computador, preservando as rotas e funcionalidades da aplicação.
+
+Conteúdo
+- templates/: telas HTML da atualização visual que serve de base para esta versão.
+- static/css/doce-pedido.css: estilos de identidade visual e regras responsivas complementares.
+- app.py e requirements.txt: incluídos para referência da versão-base; esta etapa não exige alterar a lógica do app.py.
+
+INSTALAÇÃO SEGURA
+1. Pare o Flask no terminal com Ctrl+C.
+2. Faça uma cópia de segurança da pasta atual do projeto e, principalmente, de instance\doce_pedido.db.
+3. Extraia este ZIP em uma pasta temporária.
+4. Copie a pasta templates para a pasta do projeto, substituindo os templates correspondentes.
+5. Copie a pasta static para a pasta do projeto, mesclando os arquivos. Não apague arquivos existentes que não estejam neste ZIP.
+6. NÃO substitua o banco de dados instance\doce_pedido.db.
+7. NÃO é necessário substituir app.py nem instalar dependências para esta etapa de CSS.
+8. Inicie o sistema como de costume e faça uma atualização forçada do navegador (Ctrl+F5).
+
+VALIDAÇÃO RECOMENDADA
+- Testar clientes, nova/edição de encomendas, lista de encomendas, pagamentos, calendário, produção, relatórios e lembretes.
+- Testar no navegador em largura de celular (aprox. 360–390 px), tablet e computador.
+- Conferir formulários, botões, impressão da lista de produção e calendário.
+- Em telas com tabelas largas, pode haver rolagem horizontal dentro da tabela; isso é intencional para manter todos os dados legíveis.
+
+Esta atualização é de apresentação/CSS. Ela não modifica o banco de dados nem adiciona envio automático de WhatsApp.
